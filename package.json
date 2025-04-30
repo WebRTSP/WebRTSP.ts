@@ -1,0 +1,17 @@
+{
+  "name": "webrtsp.ts",
+  "version": "0.1.0",
+  "description": "TypeScript based WebRTSP client",
+  "author": "Sergey Radionov <rsatom@gmail.com>",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "loglevel": "^1.9.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@eslint/json": "^0.13.0",
+    "eslint": "^9.31.0",
+    "globals": "^16.3.0",
+    "typescript-eslint": "^8.36.0"
+  }
+}
