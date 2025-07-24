@@ -2,7 +2,7 @@ import { AsyncWebSocket } from "./helpers/AsyncWebSocket";
 import {
     Method,
     Options,
-    CSeq,
+    type CSeq,
     Request,
     Response,
     ContentType,
@@ -145,7 +145,7 @@ export class WebRTSPClient {
 
     #checkContentType<T extends Request | Response>(
         message: T,
-        contentType: ContentType
+        contentType: string
     ): T {
         if(message.contentType != contentType)
             throw new InvalidResponse(`Unexpected Content-Type: ${contentType}`);

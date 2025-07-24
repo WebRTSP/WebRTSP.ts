@@ -4,17 +4,19 @@ import { Log, FormatTag } from './Log';
 
 const TAG = FormatTag("AsyncWebSocket");
 
-export enum AsyncWebSocketState {
-  Disconnected,
-  Connecting,
-  Connected,
-  Disconnecting,
-}
+export const AsyncWebSocketState = {
+  Disconnected: "disconnected",
+  Connecting: "",
+  Connected: "",
+  Disconnecting: "",
+} as const;
+export type AsyncWebSocketState = typeof AsyncWebSocketState[keyof typeof AsyncWebSocketState];
 
-import State = AsyncWebSocketState
+const State = AsyncWebSocketState;
+type State = AsyncWebSocketState
 
 export class AsyncWebSocket {
-  #state = State.Disconnected;
+  #state: State = State.Disconnected;
   #url: string;
   #socket?: WebSocket;
   #keepConnection = false;
@@ -64,7 +66,7 @@ export class AsyncWebSocket {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  #onSocketClose(socket: WebSocket, event: CloseEvent) {
+  #onSocketClose(socket: WebSocket, _event: CloseEvent) {
     if(this.#socket !== socket)
       return;
 
@@ -99,7 +101,7 @@ export class AsyncWebSocket {
     }
 
     const reconnectTimout = Math.floor(1000 + 4000 * Math.random());
-    this.#reconnectTimeoutId = setTimeout(() => {
+    this.#reconnectTimeoutId = window.setTimeout(() => {
         this.#reconnectTimeoutId = undefined;
         if(!this.#keepConnection) {
           return;

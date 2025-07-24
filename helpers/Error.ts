@@ -1,5 +1,3 @@
-import { StatusCode } from "../Types";
-
 export class InvalidStateError implements Error {
   name: string;
   message: string;
@@ -34,10 +32,10 @@ export class RequestFailed implements Error {
   name: string;
   get message(): string { return this.reasonPhrase; }
 
-  statusCode: StatusCode;
+  statusCode: number;
   reasonPhrase: string;
 
-  constructor(statusCode: StatusCode, reasonPhrase: string) {
+  constructor(statusCode: number, reasonPhrase: string) {
     this.name = this.constructor.name;
     this.statusCode = statusCode;
     this.reasonPhrase = reasonPhrase;

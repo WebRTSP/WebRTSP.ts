@@ -1,37 +1,39 @@
 /* eslint-disable no-unused-vars */
 export const PROTOCOL_NAME = "WEBRTSP";
 
-export enum Protocol {
-    WEBRTSP_0_2 = PROTOCOL_NAME + "/0.2",
-}
+export const Protocol = {
+    WEBRTSP_0_2: PROTOCOL_NAME + "/0.2",
+} as const;
+export type Protocol = typeof Protocol[keyof typeof Protocol];
 
 const DEFAULT_PROTOCOL = Protocol.WEBRTSP_0_2;
 
-export enum Method {
-    OPTIONS,
-    LIST,
-    DESCRIBE,
-    SETUP,
-    PLAY,
-    RECORD,
-    TEARDOWN,
-    GET_PARAMETER,
-    SET_PARAMETER,
-}
+export const Method = {
+    OPTIONS: "OPTIONS",
+    LIST: "LIST",
+    DESCRIBE: "DESCRIBE",
+    SETUP: "SETUP",
+    PLAY: "PLAY",
+    RECORD: "RECORD",
+    TEARDOWN: "TEARDOWN",
+    GET_PARAMETER: "GET_PARAMETER",
+    SET_PARAMETER: "SET_PARAMETER",
+} as const;
+export type Method = typeof Method[keyof typeof Method];
 
-export enum ContentType {
-    TEXT_PARAMETERS = "text/parameters",
-    APPLICATION_SDP = "application/sdp",
-    APPLICATION_ICE_CANDIDATE = "application/x-ice-candidate",
-}
+export const ContentType = {
+    TEXT_PARAMETERS: "text/parameters",
+    APPLICATION_SDP: "application/sdp",
+    APPLICATION_ICE_CANDIDATE: "application/x-ice-candidate",
+} as const;
 
-export enum StatusCode {
-    OK = 200
-}
+export const StatusCode = {
+    OK: 200,
+} as const;
 
-export enum ReasonPhrase {
-    OK = "OK"
-}
+export const ReasonPhrase = {
+    OK: "OK",
+} as const;
 
 export type CSeq = number
 
@@ -66,7 +68,7 @@ export class Request {
         return this.headerFields.get("content-type");
     }
 
-    set contentType(contentType: ContentType) {
+    set contentType(contentType: string) {
         this.headerFields.set("content-type", contentType);
     }
 }
@@ -98,7 +100,7 @@ export class Response {
         return this.headerFields.get("content-type");
     }
 
-    set contentType(contentType: ContentType) {
+    set contentType(contentType: string) {
         this.headerFields.set("content-type", contentType);
     }
 }

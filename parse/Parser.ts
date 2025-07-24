@@ -4,7 +4,7 @@ import ParseBuffer from "./ParseBuffer";
 import {
     Protocol,
     Method,
-    CSeq,
+    type CSeq,
     Parameters,
     Request,
     Response,

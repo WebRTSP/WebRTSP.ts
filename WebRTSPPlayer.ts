@@ -1,5 +1,5 @@
 import { WebRTSPClient } from "./WebRTSPClient";
-import { IceCandidate  } from "./parse/Parser";
+import { type IceCandidate  } from "./parse/Parser";
 
 export class WebRTSPPlayer {
     #connection: WebRTSPClient;
@@ -69,7 +69,7 @@ export class WebRTSPPlayer {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    #onIceGatheringStateChange(event: Event) {
+    #onIceGatheringStateChange(_event: Event) {
     }
 
     #onTrack(event: RTCTrackEvent) {
