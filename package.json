@@ -4,6 +4,7 @@
   "description": "TypeScript based WebRTSP client",
   "author": "Sergey Radionov <rsatom@gmail.com>",
   "license": "BSD-2-Clause",
+  "type": "module",
   "dependencies": {
     "loglevel": "^1.9.2"
   },
