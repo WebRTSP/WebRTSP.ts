@@ -631,6 +631,11 @@ export function ParseParameters(body: string): Parameters | undefined {
     const parameters = new Map<string, string>();
 
     const buffer = new ParseBuffer(body);
+
+    const eolCheckBuffer = buffer.clone();
+    if(SkipEOL(eolCheckBuffer) && eolCheckBuffer.eos)
+        return parameters;
+
     while(!buffer.eos) {
         const { name, value } = ParseParameter(buffer) || {};
 
