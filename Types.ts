@@ -14,6 +14,7 @@ export const Method = {
     DESCRIBE: "DESCRIBE",
     SETUP: "SETUP",
     PLAY: "PLAY",
+    SUBSCRIBE: "SUBSCRIBE",
     RECORD: "RECORD",
     TEARDOWN: "TEARDOWN",
     GET_PARAMETER: "GET_PARAMETER",
