@@ -6,9 +6,9 @@ const TAG = FormatTag("AsyncWebSocket");
 
 export const AsyncWebSocketState = {
   Disconnected: "disconnected",
-  Connecting: "",
-  Connected: "",
-  Disconnecting: "",
+  Connecting: "connecting",
+  Connected: "connected",
+  Disconnecting: "disconnecting",
 } as const;
 export type AsyncWebSocketState = typeof AsyncWebSocketState[keyof typeof AsyncWebSocketState];
 
