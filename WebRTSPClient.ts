@@ -254,6 +254,7 @@ export class WebRTSPClient {
     }
 
     async disconnect() {
+        this.#cancelPing();
         return this.#socket.disconnect();
     }
 
