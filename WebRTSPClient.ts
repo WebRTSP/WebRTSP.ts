@@ -59,6 +59,7 @@ export class WebRTSPClient {
         this.#cancelPing();
 
         this.#pingTimeout = setTimeout(() => {
+            this.#pingTimeout = null;
             this.#ping();
         }, PING_INTERVAL * 1000);
     }
