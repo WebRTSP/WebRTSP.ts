@@ -18,6 +18,7 @@ import { InvalidResponse, RequestFailed } from "./helpers/Error";
 
 const TAG = FormatTag("WebRTSP.Client");
 const WILDCARD_URI = "*";
+const PING_INTERVAL = 30; // seconds
 
 interface RequestData {
     request: Request,
@@ -37,8 +38,30 @@ export class WebRTSPClient {
     #nextCSeq: CSeq = 1;
     #sentRequests = new Map<CSeq, RequestData>();
     #mediaSessions = new Map<string, MediaSessionData>();
+    #pingTimeout: number | null = null;
 
     debug: boolean = true;
+
+    #ping() {
+        const request = this.#createRequest(Method.GET_PARAMETER, WILDCARD_URI);
+        this.#request(request).catch();
+    }
+
+    #cancelPing() {
+        if(!this.#pingTimeout)
+            return;
+
+        clearTimeout(this.#pingTimeout);
+        this.#pingTimeout = null;
+    }
+
+    #schedulePing() {
+        this.#cancelPing();
+
+        this.#pingTimeout = setTimeout(() => {
+            this.#ping();
+        }, PING_INTERVAL * 1000);
+    }
 
     #createRequest(
         method: Method,
@@ -170,6 +193,7 @@ export class WebRTSPClient {
 
                 try {
                     this.#socket.send(requestMessage);
+                    this.#schedulePing();
                 } catch(e: unknown) {
                     this.#sentRequests.delete(request.cseq);
 
@@ -187,12 +211,15 @@ export class WebRTSPClient {
 
         try {
             this.#socket.send(message);
+            this.#schedulePing();
         } catch(e: unknown) {
             Log.error(TAG, "Failed to send response:", e);
         }
     }
 
     #cleanup() {
+        this.#cancelPing();
+
         for(const [, requestData] of this.#sentRequests)
             requestData.continuation.resumeWithError("Disconnected");
     }
@@ -201,11 +228,14 @@ export class WebRTSPClient {
         this.#socket = new AsyncWebSocket(url);
         this.#socket.onMessage = (message) => { this.#onMessage(message); };
 
+        this.onConnected = this.#schedulePing;
         this.onDisconnected = this.#cleanup;
     }
 
     set onConnected(handler: ((client: WebRTSPClient) => void) | undefined ) {
         this.#socket.onConnected = () => {
+            this.#schedulePing();
+
             if(handler)
                 handler(this);
         };
