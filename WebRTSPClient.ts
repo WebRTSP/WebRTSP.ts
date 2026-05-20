@@ -17,6 +17,7 @@ import { InvalidResponse, RequestFailed } from "./helpers/Error";
 
 
 const TAG = FormatTag("WebRTSP.Client");
+const WILDCARD_URI = "*";
 
 interface RequestData {
     request: Request,
@@ -46,7 +47,11 @@ export class WebRTSPClient {
     ): Request {
         for(; this.#sentRequests.has(this.#nextCSeq); ++this.#nextCSeq);
 
-        return new Request(method, encodeURI(uri), this.#nextCSeq, mediaSession);
+        return new Request(
+            method,
+            uri != WILDCARD_URI ? encodeURI(uri) : WILDCARD_URI,
+            this.#nextCSeq,
+            mediaSession);
     }
 
     #sendOkResponse(
