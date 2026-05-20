@@ -38,7 +38,7 @@ export class WebRTSPClient {
     #nextCSeq: CSeq = 1;
     #sentRequests = new Map<CSeq, RequestData>();
     #mediaSessions = new Map<string, MediaSessionData>();
-    #pingTimeout: number | null = null;
+    #pingTimeout: ReturnType<typeof setTimeout> | null = null;
 
     debug: boolean = true;
 
