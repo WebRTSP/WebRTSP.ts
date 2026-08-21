@@ -15,6 +15,12 @@ export class PlayerClosed extends WebRTSPPlayerError {
     }
 }
 
+export class SDPMissing extends WebRTSPPlayerError {
+    constructor() {
+        super("SDP is missing");
+    }
+}
+
 export class WebRTSPPlayer {
     #connection: WebRTSPClient;
     #videoElement: HTMLVideoElement;
@@ -165,7 +171,7 @@ export class WebRTSPPlayer {
             this.#ensureNotClosed();
 
             if(!answer.sdp)
-                throw new Error("SDP is missing");
+                throw SDPMissing;
 
             await this.#peerConnection.setLocalDescription(answer);
 
