@@ -73,7 +73,7 @@ export class WebRTSPClient {
 
         return new Request(
             method,
-            uri != WILDCARD_URI ? encodeURI(uri) : WILDCARD_URI,
+            uri,
             this.#nextCSeq,
             mediaSession);
     }

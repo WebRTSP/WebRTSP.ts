@@ -1,4 +1,4 @@
-import { Method, Request, Response } from "./Types";
+import { Method, Request, Response, WILDCARD_URI } from "./Types";
 
 
 export function SerializeStatusCode(statusCode: number) {
@@ -13,7 +13,7 @@ export function SerializeStatusCode(statusCode: number) {
 export function SerializeRequest(request: Request): string {
     let out = Method[request.method];
     out += " ";
-    out += request.uri;
+    out += request.uri != WILDCARD_URI ? encodeURI(request.uri) : WILDCARD_URI;
     out += " ";
     out += request.protocol;
     out += "\r\n";
