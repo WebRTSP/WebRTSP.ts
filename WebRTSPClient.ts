@@ -1,5 +1,6 @@
 import { AsyncWebSocket } from "./helpers/AsyncWebSocket";
 import {
+    WILDCARD_URI,
     Method,
     Options,
     type CSeq,
@@ -17,7 +18,6 @@ import { InvalidResponse, RequestFailed } from "./helpers/Error";
 
 
 const TAG = FormatTag("WebRTSP.Client");
-const WILDCARD_URI = "*";
 const PING_INTERVAL = 30; // seconds
 
 interface RequestData {

@@ -8,6 +8,8 @@ export type Protocol = typeof Protocol[keyof typeof Protocol];
 
 const DEFAULT_PROTOCOL = Protocol.WEBRTSP_0_2;
 
+export const WILDCARD_URI = "*";
+
 export const Method = {
     OPTIONS: "OPTIONS",
     LIST: "LIST",
