@@ -1,6 +1,6 @@
 {
   "name": "webrtsp.ts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript based WebRTSP client",
   "author": "Sergey Radionov <rsatom@gmail.com>",
   "license": "BSD-2-Clause",
