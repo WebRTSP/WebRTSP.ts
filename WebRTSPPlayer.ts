@@ -1,6 +1,20 @@
 import { WebRTSPClient } from "./WebRTSPClient";
 import { type IceCandidate  } from "./parse/Parser";
 
+
+export class WebRTSPPlayerError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "WebRTSPPlayerError";
+    }
+}
+
+export class PlayerClosed extends WebRTSPPlayerError {
+    constructor() {
+        super("Player closed");
+    }
+}
+
 export class WebRTSPPlayer {
     #connection: WebRTSPClient;
     #videoElement: HTMLVideoElement;
@@ -8,6 +22,8 @@ export class WebRTSPPlayer {
     #streamerName: string;
 
     #mediaSession?: string;
+
+    #closed: boolean = false;
 
     readonly events = new EventTarget();
 
@@ -42,6 +58,11 @@ export class WebRTSPPlayer {
                 );
             };
         this.#peerConnection = peerConnection;
+    }
+
+    #ensureNotClosed() {
+        if(this.#closed)
+            throw new PlayerClosed;
     }
 
     #onIceCandidate(event: RTCPeerConnectionIceEvent) {
@@ -97,6 +118,11 @@ export class WebRTSPPlayer {
         if(!keepCurrentFrame)
             this.#videoElement.srcObject = null;
 
+        if(this.#closed)
+            return;
+
+        this.#closed = true;
+
         // FIXME? detach callbacks from PeerConnection
         this.#peerConnection.close();
         this.events.dispatchEvent(
@@ -111,8 +137,10 @@ export class WebRTSPPlayer {
         );
     }
 
-    async play() {
+    async play() /*throws*/ {
         console.assert(this.#mediaSession == undefined);
+
+        this.#ensureNotClosed();
 
         try {
             const { mediaSession, offer } =
@@ -123,16 +151,25 @@ export class WebRTSPPlayer {
                 );
             this.#mediaSession = mediaSession;
 
+            this.#ensureNotClosed();
+
             await this.#peerConnection.setRemoteDescription({
                 type: "offer",
                 sdp: offer
             });
 
+            this.#ensureNotClosed();
+
             const answer = (await this.#peerConnection.createAnswer());
+
+            this.#ensureNotClosed();
+
             if(!answer.sdp)
                 throw new Error("SDP is missing");
 
             await this.#peerConnection.setLocalDescription(answer);
+
+            this.#ensureNotClosed();
 
             await this.#connection.PLAY(
                 this.#streamerName,
