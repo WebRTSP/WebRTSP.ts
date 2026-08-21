@@ -9,10 +9,6 @@
     "loglevel": "^1.9.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.31.0",
-    "@eslint/json": "^0.13.0",
-    "eslint": "^9.31.0",
-    "globals": "^16.3.0",
-    "typescript-eslint": "^8.36.0"
+    "oxlint": "^1.79.0"
   }
 }
