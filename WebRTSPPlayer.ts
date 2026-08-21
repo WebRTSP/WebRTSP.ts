@@ -22,10 +22,10 @@ export class SDPMissing extends WebRTSPPlayerError {
 }
 
 export class WebRTSPPlayer {
-    #connection: WebRTSPClient;
-    #videoElement: HTMLVideoElement;
-    #peerConnection: RTCPeerConnection;
-    #streamerName: string;
+    readonly #connection: WebRTSPClient;
+    readonly #uri: string;
+    readonly #videoElement: HTMLVideoElement;
+    readonly #peerConnection: RTCPeerConnection;
 
     #mediaSession?: string;
 
@@ -36,12 +36,12 @@ export class WebRTSPPlayer {
     constructor(
         connection: WebRTSPClient,
         iceServers: RTCIceServer[],
-        streamerName: string,
+        uri: string,
         videoElement: HTMLVideoElement
     ) {
         this.#connection = connection;
+        this.#uri = uri;
         this.#videoElement = videoElement;
-        this.#streamerName = streamerName;
 
         const peerConnection = new RTCPeerConnection({ iceServers });
         peerConnection.onicecandidate =
@@ -72,7 +72,7 @@ export class WebRTSPPlayer {
     }
 
     #onIceCandidate(event: RTCPeerConnectionIceEvent) {
-        if(!this.#streamerName)
+        if(!this.#uri)
             return;
         if(!this.#mediaSession)
             return;
@@ -89,7 +89,7 @@ export class WebRTSPPlayer {
                 }\r\n`;
 
             this.#connection.SETUP(
-                this.#streamerName,
+                this.#uri,
                 this.#mediaSession,
                 candidate);
         }
@@ -149,12 +149,10 @@ export class WebRTSPPlayer {
         this.#ensureNotClosed();
 
         try {
-            const { mediaSession, offer } =
-                await this.#connection.DESCRIBE(
-                    this.#streamerName,
-                    this.#onRemoteIceCandidate.bind(this),
-                    this.#onRemoteTeardown.bind(this),
-                );
+            const { mediaSession, offer } = await this.#connection.DESCRIBE(
+                this.#uri,
+                this.#onRemoteIceCandidate.bind(this),
+                this.#onRemoteTeardown.bind(this));
             this.#mediaSession = mediaSession;
 
             this.#ensureNotClosed();
@@ -178,7 +176,7 @@ export class WebRTSPPlayer {
             this.#ensureNotClosed();
 
             await this.#connection.PLAY(
-                this.#streamerName,
+                this.#uri,
                 mediaSession,
                 answer.sdp);
         } catch(e: unknown) {
@@ -190,9 +188,8 @@ export class WebRTSPPlayer {
     stop() {
         if(this.#mediaSession) {
             this.#connection.TEARDOWN(
-                this.#streamerName,
-                this.#mediaSession
-            ).catch();
+                this.#uri,
+                this.#mediaSession).catch();
             this.#mediaSession = undefined;
         }
 
