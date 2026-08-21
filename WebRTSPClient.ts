@@ -106,6 +106,7 @@ export class WebRTSPClient {
                 }
                 case Method.TEARDOWN: {
                     sessionData.teardownHandler();
+                    this.#mediaSessions.delete(request.session);
                     break;
                 }
                 default:
@@ -323,6 +324,7 @@ export class WebRTSPClient {
     }
 
     async TEARDOWN(uri: string, mediaSession: string) {
+        this.#mediaSessions.delete(mediaSession);
         const request = this.#createRequest(Method.TEARDOWN, uri, mediaSession);
         await this.#request(request);
     }
