@@ -9,7 +9,8 @@ import {
     ContentType,
     URI2Description,
     StatusCode,
-    ReasonPhrase} from "./Types";
+    ReasonPhrase,
+    type Credentials} from "./Types";
 import { SerializeRequest, SerializeResponse } from "./Serialize";
 import * as Parser from "./parse/Parser";
 import { Log, FormatTag } from './helpers/Log';
@@ -43,7 +44,10 @@ export class WebRTSPClient {
     debug: boolean = true;
 
     #ping() {
-        const request = this.#createRequest(Method.GET_PARAMETER, WILDCARD_URI);
+        const request = this.#createRequest(
+            Method.GET_PARAMETER,
+            WILDCARD_URI,
+            undefined);
         this.#request(request).catch();
     }
 
@@ -67,6 +71,7 @@ export class WebRTSPClient {
     #createRequest(
         method: Method,
         uri: string,
+        credentials: Credentials | undefined,
         mediaSession?: string
     ): Request {
         for(; this.#sentRequests.has(this.#nextCSeq); ++this.#nextCSeq);
@@ -75,7 +80,8 @@ export class WebRTSPClient {
             method,
             uri,
             this.#nextCSeq,
-            mediaSession);
+            mediaSession,
+            credentials);
     }
 
     #sendOkResponse(
@@ -260,15 +266,27 @@ export class WebRTSPClient {
         return this.#socket.disconnect();
     }
 
-    async OPTIONS(uri: string): Promise<Options> /*throws*/ {
-        const request = this.#createRequest(Method.OPTIONS, uri);
+    async OPTIONS(
+        uri: string,
+        credentials: Credentials | undefined
+    ): Promise<Options> /*throws*/ {
+        const request = this.#createRequest(
+            Method.OPTIONS,
+            uri,
+            credentials);
         const response = await this.#request(request);
 
         return Parser.ParseOptions(response);
     }
 
-    async LIST(uri: string): Promise<URI2Description> /*throws*/ {
-        const request = this.#createRequest(Method.LIST, uri);
+    async LIST(
+        uri: string,
+        credentials: Credentials | undefined
+    ): Promise<URI2Description> /*throws*/ {
+        const request = this.#createRequest(
+            Method.LIST,
+            uri,
+            credentials);
         const response = this.#checkContentType(
             await this.#request(request),
             ContentType.TEXT_PARAMETERS);
@@ -287,10 +305,14 @@ export class WebRTSPClient {
 
     async DESCRIBE(
         uri: string,
+        credentials: Credentials | undefined,
         onIceCandidate: IceCandidateHandler,
         onTeardown: TeardownHandler,
     ): Promise<{ offer: string, mediaSession: string }> {
-        const request = this.#createRequest(Method.DESCRIBE, uri);
+        const request = this.#createRequest(
+            Method.DESCRIBE,
+            uri,
+            credentials);
         const response = this.#checkContentType(
             await this.#request(request),
             ContentType.APPLICATION_SDP);
@@ -309,23 +331,49 @@ export class WebRTSPClient {
         return { offer: response.body, mediaSession: response.session };
     }
 
-    async PLAY(uri: string, mediaSession: string, answer: string) {
-        const request = this.#createRequest(Method.PLAY, uri, mediaSession);
+    async PLAY(
+        uri: string,
+        mediaSession: string,
+        answer: string,
+        credentials: Credentials | undefined,
+    ) {
+        const request = this.#createRequest(
+            Method.PLAY,
+            uri,
+            credentials,
+            mediaSession);
         request.contentType = ContentType.APPLICATION_SDP;
         request.body = answer;
         await this.#request(request);
     }
 
-    async SETUP(uri: string, mediaSession: string, iceCandidate: string) {
-        const request = this.#createRequest(Method.SETUP, uri, mediaSession);
+    async SETUP(
+        uri: string,
+        mediaSession: string,
+        iceCandidate: string,
+        credentials: Credentials | undefined,
+    ) {
+        const request = this.#createRequest(
+            Method.SETUP,
+            uri,
+            credentials,
+            mediaSession);
         request.contentType = ContentType.APPLICATION_ICE_CANDIDATE;
         request.body = iceCandidate;
         await this.#request(request);
     }
 
-    async TEARDOWN(uri: string, mediaSession: string) {
+    async TEARDOWN(
+        uri: string,
+        mediaSession: string,
+        credentials: Credentials | undefined,
+    ) {
         this.#mediaSessions.delete(mediaSession);
-        const request = this.#createRequest(Method.TEARDOWN, uri, mediaSession);
+        const request = this.#createRequest(
+            Method.TEARDOWN,
+            uri,
+            credentials,
+            mediaSession);
         await this.#request(request);
     }
 }

@@ -1,3 +1,4 @@
+import type { Credentials } from "./Types";
 import { WebRTSPClient } from "./WebRTSPClient";
 import { type IceCandidate  } from "./parse/Parser";
 
@@ -24,6 +25,7 @@ export class SDPMissing extends WebRTSPPlayerError {
 export class WebRTSPPlayer {
     readonly #connection: WebRTSPClient;
     readonly #uri: string;
+    readonly #credentials: Credentials | undefined;
     readonly #videoElement: HTMLVideoElement;
     readonly #peerConnection: RTCPeerConnection;
 
@@ -37,10 +39,12 @@ export class WebRTSPPlayer {
         connection: WebRTSPClient,
         iceServers: RTCIceServer[],
         uri: string,
+        credentials: Credentials | undefined,
         videoElement: HTMLVideoElement
     ) {
         this.#connection = connection;
         this.#uri = uri;
+        this.#credentials = credentials;
         this.#videoElement = videoElement;
 
         const peerConnection = new RTCPeerConnection({ iceServers });
@@ -91,7 +95,8 @@ export class WebRTSPPlayer {
             this.#connection.SETUP(
                 this.#uri,
                 this.#mediaSession,
-                candidate);
+                candidate,
+                this.#credentials);
         }
     }
 
@@ -151,6 +156,7 @@ export class WebRTSPPlayer {
         try {
             const { mediaSession, offer } = await this.#connection.DESCRIBE(
                 this.#uri,
+                this.#credentials,
                 this.#onRemoteIceCandidate.bind(this),
                 this.#onRemoteTeardown.bind(this));
             this.#mediaSession = mediaSession;
@@ -178,7 +184,8 @@ export class WebRTSPPlayer {
             await this.#connection.PLAY(
                 this.#uri,
                 mediaSession,
-                answer.sdp);
+                answer.sdp,
+                this.#credentials);
         } catch(e: unknown) {
             this.stop();
             throw e;
@@ -189,7 +196,8 @@ export class WebRTSPPlayer {
         if(this.#mediaSession) {
             this.#connection.TEARDOWN(
                 this.#uri,
-                this.#mediaSession).catch();
+                this.#mediaSession,
+                this.#credentials).catch();
             this.#mediaSession = undefined;
         }
 

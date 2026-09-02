@@ -48,23 +48,36 @@ export class Parameters extends Map<string, string> {}
 
 export class URI2Description extends Map<string, string> {} // uri -> description
 
+export interface Credentials {
+    userName?: string;
+    accessToken: string;
+}
+
 export class Request {
     readonly method: Method;
     readonly uri: string;
     readonly protocol: Protocol = DEFAULT_PROTOCOL;
     readonly cseq: CSeq;
     readonly session?: string;
+    readonly credentials?: Credentials;
 
     headerFields = new HeaderFields();
 
     body: string = "";
 
-    constructor(method: Method, uri: string, cseq: CSeq, session?: string) {
+    constructor(
+        method: Method,
+        uri: string,
+        cseq: CSeq,
+        session?: string,
+        credentials?: Credentials,
+    ) {
         this.method = method;
         this.uri = uri;
         this.cseq = cseq;
         if(session)
             this.session = session;
+        this.credentials = credentials;
     }
 
     get contentType(): string | undefined {

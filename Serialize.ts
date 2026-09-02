@@ -28,6 +28,13 @@ export function SerializeRequest(request: Request): string {
         out += "\r\n";
     }
 
+    if(request.credentials) {
+        const credentials = request.credentials;
+        out += "Authorization: ";
+        out += `Basic ${encodeURIComponent(credentials.userName ?? "")}:${credentials.accessToken}`;
+        out += "\r\n";
+    }
+
     for(const [key, value] of request.headerFields) {
         out += key;
         out += ": ";
