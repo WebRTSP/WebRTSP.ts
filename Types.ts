@@ -75,8 +75,7 @@ export class Request {
         this.method = method;
         this.uri = uri;
         this.cseq = cseq;
-        if(session)
-            this.session = session;
+        this.session = session;
         this.credentials = credentials;
     }
 
