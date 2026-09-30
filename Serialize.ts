@@ -31,7 +31,10 @@ export function SerializeRequest(request: Request): string {
     if(request.credentials) {
         const credentials = request.credentials;
         out += "Authorization: ";
-        out += `Basic ${encodeURIComponent(credentials.userName ?? "")}:${credentials.accessToken}`;
+        if(credentials.userName)
+            out += `Basic ${encodeURIComponent(credentials.userName)}:${credentials.accessToken}`;
+        else
+            out += `Bearer ${credentials.accessToken}`;
         out += "\r\n";
     }
 
